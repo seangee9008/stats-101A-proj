@@ -1,7 +1,10 @@
+# Import libraries
 library(dplyr)
 library(ggplot2)
 
+# Parameters
 data <- read.csv("dataset.csv", header=TRUE)
+save_data <- TRUE
 
 # Clean but check it just in case
 
@@ -22,4 +25,6 @@ head(df_cleaned)
 
 df_cleaned <- df_cleaned %>% select(-c(`Report.Link`, `Company.Site`))
 
-#write.csv(df_cleaned, file = "cleaned_dataset.csv")
+if (save_data){
+  write.csv(df_cleaned, file = "cleaned_dataset.csv")
+}
