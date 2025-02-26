@@ -3,7 +3,7 @@ library(tidyverse)
 
 # Parameters
 data <- read.csv("dataset.csv", header=TRUE)
-save_data <- FALSE
+save_data <- TRUE
 
 # Clean but check it just in case
 
@@ -42,13 +42,6 @@ barplot(report_years)
 
 # Define initial exploration function
 initial_exploration <- function(dataframe){
-  ## See the summary of quantitative variables
-  quant_vars <- df_cleaned %>% 
-    select(-c('Company.Name', 'NACE.Section', 'NACE.Letter', "NACE.Division", "Report.Year"))
-  
-  print(summary(quant_vars))
-  print(cor(quant_vars))
-  ### Observation: pay gap variables correlate strongly with each others but only correlate weakly with gender composition variables, and vice versa.
   
   ## Narrow down the tables to only include certain variables
   new_table <- data.frame(Report.Year, Mean.Hourly.Gap, Median.Hourly.Gap, Q1.Female, Q2.Female, Q3.Female, Q4.Female, Percentage.Employees.Female)
