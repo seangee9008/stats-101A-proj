@@ -1,7 +1,7 @@
 library(dplyr)
 library(ggplot2)
 
-data <- read.csv("~/Downloads/dataset.csv", header=TRUE)
+data <- read.csv("dataset.csv", header=TRUE)
 
 # Clean but check it just in case
 
@@ -18,3 +18,8 @@ fill_na_with_mean <- function(data) {
 df_cleaned <- fill_na_with_mean(data)
 head(df_cleaned)
 
+#drop columns
+
+df_cleaned <- df_cleaned %>% select(-c(`Report.Link`, `Company.Site`))
+
+#write.csv(df_cleaned, file = "cleaned_dataset.csv")

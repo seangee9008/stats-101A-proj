@@ -1,0 +1,16 @@
+---
+title: "Report"
+author: 'Alan Wu, Oscar Su, Sean Gee, Shelby Jackson, Alton Law'
+date: "2025-02-25"
+output: html_document
+---
+
+```{r}
+data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% select(-X)
+```
+
+```{r}
+hist(data$Mean.Hourly.Gap, breaks = 50)
+hist(data$Median.Hourly.Gap, breaks = 50)
+```
+Target prediction variable : Mean Hourly Gap just because it looks more normal
