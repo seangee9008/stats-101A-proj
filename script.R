@@ -17,7 +17,15 @@ fill_na_with_mean <- function(data) {
   return(data)
 }
 
+
+fill_na_percentage <- function(data) {
+  data <- data %>% mutate(`Percentage.Employees.Female` = (`Q1.Female` + `Q2.Female` + `Q3.Female` + `Q4.Female`)/4) %>%
+    mutate(`Percentage.Employees.Male` = (`Q1.Men` + `Q2.Male` + `Q3.Male` + `Q4.Male`)/4)
+  data
+}
+
 df_cleaned <- fill_na_with_mean(data)
+df_cleaned <- fill_na_percentage(data)
 df_cleaned <- na.omit(data)
 df_cleaned <- data[complete.cases(data[, c("Mean.Hourly.Gap", "Median.Hourly.Gap", "Q1.Female", "Q2.Female", "Q3.Female", "Q4.Female", "Percentage.Employees.Female")]), ]
 head(df_cleaned)
@@ -74,3 +82,4 @@ initial_exploration(C)
 P <- df_cleaned %>% 
   filter(NACE.Letter == "P")
 initial_exploration(P)
+
