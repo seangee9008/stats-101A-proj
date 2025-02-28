@@ -26,8 +26,8 @@ fill_na_percentage <- function(data) {
 
 df_cleaned <- fill_na_with_mean(data)
 df_cleaned <- fill_na_percentage(df_cleaned)
-df_cleaned <- na.omit(data)
-df_cleaned <- data[complete.cases(data[, c("Mean.Hourly.Gap", "Median.Hourly.Gap", "Q1.Female", "Q2.Female", "Q3.Female", "Q4.Female", "Percentage.Employees.Female")]), ]
+#df_cleaned <- na.omit(data)
+#df_cleaned <- data[complete.cases(data[, c("Mean.Hourly.Gap", "Median.Hourly.Gap", "Q1.Female", "Q2.Female", "Q3.Female", "Q4.Female", "Percentage.Employees.Female")]), ]
 head(df_cleaned)
 
 #drop columns

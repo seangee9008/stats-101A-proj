@@ -11,11 +11,6 @@ data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% select(-X)
 attach(data)
 ```
 
-```{r}
-hist(data$Mean.Hourly.Gap, breaks = 50)
-hist(data$Median.Hourly.Gap, breaks = 50)
-```
-
 Target prediction variable : Mean Hourly Gap just because it looks more normal
 
 # Summary statistics and data exploration
@@ -31,7 +26,13 @@ barplot(report_years)
 
 ## Extract variables
 ```{r}
+library(vtable)
+
 new_table <- data.frame(Report.Year, Mean.Hourly.Gap, Median.Hourly.Gap, Q1.Female, Q2.Female, Q3.Female, Q4.Female, Percentage.Employees.Female)
+
+## Descriptive tables
+st(new_table, digits=4)
+
 cor(new_table)
 pairs(new_table)
 ```
