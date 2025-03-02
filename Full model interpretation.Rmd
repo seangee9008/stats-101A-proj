@@ -46,19 +46,6 @@ The density plots on the diagonal show that Mean.Hourly.Gap is still right-skewe
 
 
 ```{r}
-#AIC/BIC pre-transformation
-library(MASS)
-stepwise_model <- stepAIC(full_model, direction = "both")
-summary(stepwise_model)
-
-stepwise_model_BIC <- stepAIC(full_model, direction = "both", k = log(nrow(df_cleaned)))
-summary(stepwise_model_BIC)
-```
-
-Based on both the AIC and BIC models, we can confidently remove the Report.Year variable as a predictor because it had a high p-value (0.732) in the full model, indicating that it is not statistically significant in explaining Mean.Hourly.Gap. Additionally, removing it did not decrease the model’s explanatory power, as the Multiple R² (0.3197 for AIC, 0.3175 for BIC) and Adjusted R² (0.318 and 0.3163, respectively) remained nearly unchanged. The F-statistic is still highly significant (p < 2.2e-16), meaning the model remains statistically strong even after excluding Report.Year. This suggests that the gender pay gap is primarily influenced by the quartile distribution of female employees, reinforcing that structural workforce composition matters more than temporal trends in explaining pay disparities.
-
-
-```{r}
 # VIF
 library(car)
 vif(full_model)  # If VIF > 5, consider removing redundant variables
@@ -83,4 +70,4 @@ df_cleaned <- df_cleaned[complete.cases(df_cleaned), ]
 full_model_log <- lm(Mean.Hourly.Gap ~ Report.Year + Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = df_cleaned)
 summary(full_model_log)
 ```
-
+After applying the log transformation to Mean.Hourly.Gap, the model now represents percentage changes in the pay gap rather than absolute differences. Q1 and Q2 female representation still increases the pay gap, while Q4 reduces it, reinforcing the importance of women in higher-paying roles. Q3.Female is no longer significant (p = 0.370), and Report.Year remains insignificant (p = 0.144), suggesting gender pay trends have not changed. 
