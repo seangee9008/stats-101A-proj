@@ -51,7 +51,6 @@ library(car)
 vif(full_model)  # If VIF > 5, consider removing redundant variables
 ```
 The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with Q3.Female exceeding the threshold of 5, suggesting that some predictors may be redundant and could inflate standard errors.
-```
 
 ```{r}
 #Using a Box-Cox Transformation 

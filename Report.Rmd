@@ -7,7 +7,11 @@ output: html_document
 
 ```{r}
 library(tidyverse)
-data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% select(-X)
+library(car)
+library(ggplot2)
+library(MASS)
+library(vtable)
+data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% dplyr::select(-X)
 attach(data)
 ```
 # Summary statistics and data exploration
@@ -23,8 +27,6 @@ barplot(report_years)
 
 ## Extract variables
 ```{r}
-library(vtable)
-
 new_table <- data.frame(Report.Year, Mean.Hourly.Gap, Median.Hourly.Gap, Q1.Female, Q2.Female, Q3.Female, Q4.Female, Percentage.Employees.Female)
 
 ## Descriptive tables
@@ -42,10 +44,10 @@ for (col in 2:ncol(new_table)){
 }
 ```
 
-## initial fit
+## Results and Interpretation
 ```{r}
-fullmodel <- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = data)
-summary(fullmodel)
+full_model <- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = data)
+summary(full_model)
 ```
 
 From the full model, we derive the equation: \
@@ -55,7 +57,40 @@ The p-value is 2.2e-16 which is less than 0.05, giving significant evidence to r
 
 ```{r}
 par(mfrow = c(2,2))
-plot(fullmodel)
+plot(full_model)
 ```
 
 The Residuals vs Fitted plot shows the relationship is linear at mean 0. The Q-Q plot shows heavy tailing indicating deviation from normality. There also seems to be non-constant variance shown in the standardized residuals plot which violates the linear model assumption. Residuals vs Leverage doesn't show any outliers or leverage points that need inspection.
+
+```{r}
+scatter_data <- data[, c("Mean.Hourly.Gap", "Report.Year", "Q1.Female", "Q2.Female", "Q3.Female", "Q4.Female")]
+ggpairs(scatter_data, 
+        title = "Scatter Plot Matrix of Full Model Variables",
+        aes(alpha = 0.6))
+```
+The density plots on the diagonal show that Mean.Hourly.Gap is still right-skewed, reinforcing the need for a log transformation to improve normality. The correlation values confirm multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with correlations reaching 0.881, indicating that some of these predictors may be redundant and could inflate variance in the model. The scatter plots illustrate strong positive linear relationships between the quartile-based female representation variables, further supporting the presence of collinearity. Meanwhile, Report.Year exhibits weak correlations with all variables, implying that it likely does not play a significant role in predicting the gender pay gap.
+
+```{r}
+# VIF
+vif(full_model)  # If VIF > 5, consider removing redundant variables
+```
+
+The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with Q3.Female exceeding the threshold of 5, suggesting that some predictors may be redundant and could inflate standard errors.
+
+```{r}
+#Using a Box-Cox Transformation 
+new_data <- data[data$Mean.Hourly.Gap > 0, ]
+full_model<- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.FemaleQ4.Female, data = new_data)
+boxcox(full_model, lambda = seq(0, 1, 0.1))
+```
+
+The Box-Cox transformation plot suggests an optimal lambda near 0, meaning that a log transformation of Mean.Hourly.Gap is necessary to stabilize variance and improve normality.
+
+USING LOG TRANFORMATION
+```{r}
+df_cleaned$Mean.Hourly.Gap <- (df_cleaned$Mean.Hourly.Gap)^(2/5)
+df_cleaned <- df_cleaned[complete.cases(df_cleaned), ]
+full_model_log <- lm(Mean.Hourly.Gap ~ Report.Year + Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = df_cleaned)
+summary(full_model_log)
+```
+After applying the log transformation to Mean.Hourly.Gap, the model now represents percentage changes in the pay gap rather than absolute differences. Q1 and Q2 female representation still increases the pay gap, while Q4 reduces it, reinforcing the importance of women in higher-paying roles. Q3.Female is no longer significant (p = 0.370), and Report.Year remains insignificant (p = 0.144), suggesting gender pay trends have not changed. 
