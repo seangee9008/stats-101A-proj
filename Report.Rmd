@@ -8,7 +8,7 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(car)
-library(ggplot2)
+library(GGally)
 library(MASS)
 library(vtable)
 data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% dplyr::select(-X)
@@ -18,11 +18,12 @@ attach(data)
 
 ## Distribution of categorical variables
 ```{r}
+par(mfrow = c(1, 2))
 company_type <- table(NACE.Letter)
-barplot(company_type)
+barplot(company_type, xlab="Company Type by NACE Letters", ylab="Count")
 
 report_years <- table(Report.Year)
-barplot(report_years)
+barplot(report_years, xlab="Year Reported", ylab="Count")
 ```
 
 ## Extract variables
@@ -38,7 +39,7 @@ pairs(new_table)
 
 ### Distribution of variables
 ```{r}
-par(mfrow = c(2,3))
+par(mfrow = c(2,4))
 for (col in 2:ncol(new_table)){
   hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
 }
