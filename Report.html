@@ -582,52 +582,12 @@ Law</h4>
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-## ✔ purrr     1.0.2     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(car)</code></pre>
-<pre><code>## Warning: package &#39;car&#39; was built under R version 4.3.3</code></pre>
-<pre><code>## Loading required package: carData</code></pre>
-<pre><code>## Warning: package &#39;carData&#39; was built under R version 4.3.3</code></pre>
-<pre><code>## 
-## Attaching package: &#39;car&#39;
-## 
-## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     recode
-## 
-## The following object is masked from &#39;package:purrr&#39;:
-## 
-##     some</code></pre>
-<pre class="r"><code>library(GGally)</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
-##   method from   
-##   +.gg   ggplot2</code></pre>
-<pre class="r"><code>library(MASS)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;MASS&#39;
-## 
-## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     select</code></pre>
-<pre class="r"><code>library(vtable)</code></pre>
-<pre><code>## Warning: package &#39;vtable&#39; was built under R version 4.3.3</code></pre>
-<pre><code>## Loading required package: kableExtra
-## 
-## Attaching package: &#39;kableExtra&#39;
-## 
-## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     group_rows</code></pre>
-<pre class="r"><code>data &lt;- read.csv(&quot;cleaned_dataset.csv&quot;, header=TRUE) %&gt;% dplyr::select(-X)
+<pre class="r"><code>library(tidyverse)
+library(car)
+library(GGally)
+library(MASS)
+library(vtable)
+data &lt;- read.csv(&quot;cleaned_dataset.csv&quot;, header=TRUE) %&gt;% dplyr::select(-X)
 attach(data)</code></pre>
 <div id="summary-statistics-and-data-exploration" class="section level1">
 <h1>Summary statistics and data exploration</h1>
