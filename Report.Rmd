@@ -79,27 +79,18 @@ vif(full_model)  # If VIF > 5, consider removing redundant variables
 
 The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with Q3.Female exceeding the threshold of 5, suggesting that some predictors may be redundant and could inflate standard errors.
 
+# Weighted Least Solutions
 ```{r}
-#Using a Box-Cox Transformation 
-new_data <- data[data$Mean.Hourly.Gap > 0, ]
-full_model<- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = new_data)
-boxcox(full_model, lambda = seq(0, 1, 0.1))
-bc <- powerTransform(full_model)
-summary(bc)
+ols_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = df_cleaned)
+residuals_ols <- abs(resid(ols_model))
+variance_model <- lm(residuals_ols ~ fitted(ols_model))
+weights <- 1 / (fitted(variance_model)^2)
+
+wls_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, 
+                data = df_cleaned, weights = weights)
+summary(wls_model)
 ```
 
-The Box-Cox transformation plot suggests an optimal lambda near 0, meaning that a log transformation of Mean.Hourly.Gap is necessary to stabilize variance and improve normality.
-
-USING LOG TRANFORMATION
 ```{r}
-new_data$Mean.Hourly.Gap <- log(new_data$Mean.Hourly.Gap)
-full_model_log <- lm(Mean.Hourly.Gap ~ Report.Year + Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = new_data)
-summary(full_model_log)
-```
-
-After applying the log transformation to Mean.Hourly.Gap, the model now represents percentage changes in the pay gap rather than absolute differences. Q1 and Q2 female representation still increases the pay gap, while Q4 reduces it, reinforcing the importance of women in higher-paying roles. Q3.Female is no longer significant (p = 0.370), and Report.Year remains insignificant (p = 0.144), suggesting gender pay trends have not changed. 
-
-```{r}
-par(mfrow = c(2,2))
-plot(full_model_log)
-```
+par(mfrow = c(2, 2))
+plot(wls_model) 
