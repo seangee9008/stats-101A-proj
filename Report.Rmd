@@ -10,9 +10,6 @@ library(tidyverse)
 data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% select(-X)
 attach(data)
 ```
-
-Target prediction variable : Mean Hourly Gap just because it looks more normal
-
 # Summary statistics and data exploration
 
 ## Distribution of categorical variables
@@ -39,6 +36,7 @@ pairs(new_table)
 
 ### Distribution of variables
 ```{r}
+par(mfrow = c(2,3))
 for (col in 2:ncol(new_table)){
   hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
 }
@@ -46,6 +44,18 @@ for (col in 2:ncol(new_table)){
 
 ## initial fit
 ```{r}
-m1 <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female + Percentage.Employees.Female)
-summary(m1)
+fullmodel <- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = data)
+summary(fullmodel)
 ```
+
+From the full model, we derive the equation: \
+Mean.Hourly.Gap = -0.087(Report.Year) + 0.35(Q1.Female) + 0.255(Q2.Female) + 0.153(Q3.Female) + -0.731(Q4.Female) \
+The summary indicates an R^2 value of 0.4615, meaning 46.15% of the variation in mean hourly gap can be explained by the variables: Report.Year, Q1.Female, Q2.Female, Q3.Female, Q4.Female
+The p-value is 2.2e-16 which is less than 0.05, giving significant evidence to reject the null hypothesis meaning of the predictors in the model is significant.
+
+```{r}
+par(mfrow = c(2,2))
+plot(fullmodel)
+```
+
+The Residuals vs Fitted plot shows the relationship is linear at mean 0. The Q-Q plot shows heavy tailing indicating deviation from normality. There also seems to be non-constant variance shown in the standardized residuals plot which violates the linear model assumption. Residuals vs Leverage doesn't show any outliers or leverage points that need inspection.
