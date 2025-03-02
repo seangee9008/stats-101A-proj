@@ -31,4 +31,56 @@ plot(fullmodel)
 Residuals has mean 0
 The Q-Q plot shows deviation from normality.
 Standardized residuals show non-constant variance
-No outliers in Residuals vs Leverage
+No outliers in Residuals vs Leverage but has influential observations (6750, 3320, and 2480) that may disproportionately impact the model
+
+
+#Sean's parts:
+```{r}
+scatter_data <- df_cleaned[, c("Mean.Hourly.Gap", "Report.Year", "Q1.Female", "Q2.Female", "Q3.Female", "Q4.Female")]
+ggpairs(scatter_data, 
+        title = "Scatter Plot Matrix of Full Model Variables",
+        aes(alpha = 0.6))
+```
+The density plots on the diagonal show that Mean.Hourly.Gap is still right-skewed, reinforcing the need for a log transformation to improve normality. The correlation values confirm multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with correlations reaching 0.881, indicating that some of these predictors may be redundant and could inflate variance in the model. The scatter plots illustrate strong positive linear relationships between the quartile-based female representation variables, further supporting the presence of collinearity. Meanwhile, Report.Year exhibits weak correlations with all variables, implying that it likely does not play a significant role in predicting the gender pay gap.
+
+
+
+```{r}
+#AIC/BIC pre-transformation
+library(MASS)
+stepwise_model <- stepAIC(full_model, direction = "both")
+summary(stepwise_model)
+
+stepwise_model_BIC <- stepAIC(full_model, direction = "both", k = log(nrow(df_cleaned)))
+summary(stepwise_model_BIC)
+```
+
+Based on both the AIC and BIC models, we can confidently remove the Report.Year variable as a predictor because it had a high p-value (0.732) in the full model, indicating that it is not statistically significant in explaining Mean.Hourly.Gap. Additionally, removing it did not decrease the model’s explanatory power, as the Multiple R² (0.3197 for AIC, 0.3175 for BIC) and Adjusted R² (0.318 and 0.3163, respectively) remained nearly unchanged. The F-statistic is still highly significant (p < 2.2e-16), meaning the model remains statistically strong even after excluding Report.Year. This suggests that the gender pay gap is primarily influenced by the quartile distribution of female employees, reinforcing that structural workforce composition matters more than temporal trends in explaining pay disparities.
+
+
+```{r}
+# VIF
+library(car)
+vif(full_model)  # If VIF > 5, consider removing redundant variables
+```
+The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with Q3.Female exceeding the threshold of 5, suggesting that some predictors may be redundant and could inflate standard errors.
+```
+
+```{r}
+#Using a Box-Cox Transformation 
+df_cleaned <- df_cleaned[df_cleaned$Mean.Hourly.Gap > 0, ]
+full_model<- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = df_cleaned)
+boxcox(full_model, lambda = seq(-2, 2, 0.1))
+```
+
+The Box-Cox transformation plot suggests an optimal lambda near 0, meaning that a log transformation of Mean.Hourly.Gap is necessary to stabilize variance and improve normality.
+
+
+USING LOG TRANFORMATION
+```{r}
+df_cleaned$Mean.Hourly.Gap <- log(df_cleaned$Mean.Hourly.Gap)
+df_cleaned <- df_cleaned[complete.cases(df_cleaned), ]
+full_model_log <- lm(Mean.Hourly.Gap ~ Report.Year + Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = df_cleaned)
+summary(full_model_log)
+```
+
