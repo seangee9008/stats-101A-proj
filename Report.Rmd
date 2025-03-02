@@ -80,7 +80,7 @@ The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Femal
 ```{r}
 #Using a Box-Cox Transformation 
 new_data <- data[data$Mean.Hourly.Gap > 0, ]
-full_model<- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.FemaleQ4.Female, data = new_data)
+full_model<- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = new_data)
 boxcox(full_model, lambda = seq(0, 1, 0.1))
 ```
 
@@ -88,9 +88,14 @@ The Box-Cox transformation plot suggests an optimal lambda near 0, meaning that 
 
 USING LOG TRANFORMATION
 ```{r}
-df_cleaned$Mean.Hourly.Gap <- (df_cleaned$Mean.Hourly.Gap)^(2/5)
-df_cleaned <- df_cleaned[complete.cases(df_cleaned), ]
-full_model_log <- lm(Mean.Hourly.Gap ~ Report.Year + Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = df_cleaned)
+new_data$Mean.Hourly.Gap <- log(new_data$Mean.Hourly.Gap)
+new_data <- new_data[complete.cases(new_data), ]
+full_model_log <- lm(Mean.Hourly.Gap ~ Report.Year + Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = new_data)
 summary(full_model_log)
 ```
+
 After applying the log transformation to Mean.Hourly.Gap, the model now represents percentage changes in the pay gap rather than absolute differences. Q1 and Q2 female representation still increases the pay gap, while Q4 reduces it, reinforcing the importance of women in higher-paying roles. Q3.Female is no longer significant (p = 0.370), and Report.Year remains insignificant (p = 0.144), suggesting gender pay trends have not changed. 
+
+```{r}
+plot(full_model_log)
+```
