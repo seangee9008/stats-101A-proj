@@ -83,6 +83,8 @@ The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Femal
 new_data <- data[data$Mean.Hourly.Gap > 0, ]
 full_model<- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = new_data)
 boxcox(full_model, lambda = seq(0, 1, 0.1))
+bc <- powerTransform(full_model)
+summary(bc)
 ```
 
 The Box-Cox transformation plot suggests an optimal lambda near 0, meaning that a log transformation of Mean.Hourly.Gap is necessary to stabilize variance and improve normality.
