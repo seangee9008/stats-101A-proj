@@ -51,9 +51,9 @@ full_model <- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.
 summary(full_model)
 ```
 
-From the full model, we derive the equation: \
-Mean.Hourly.Gap = -0.087(Report.Year) + 0.35(Q1.Female) + 0.255(Q2.Female) + 0.153(Q3.Female) + -0.731(Q4.Female) \
-The summary indicates an R^2 value of 0.4615, meaning 46.15% of the variation in mean hourly gap can be explained by the variables: Report.Year, Q1.Female, Q2.Female, Q3.Female, Q4.Female
+From the full model, we derive the equation:
+$$Mean.Hourly.Gap = -0.087(Report.Year) + 0.35(Q1.Female) + 0.255(Q2.Female) + 0.153(Q3.Female) + -0.731(Q4.Female)$$
+The summary indicates an $R^2$ value of 0.4615, meaning 46.15% of the variation in mean hourly gap can be explained by the variables: Report.Year, Q1.Female, Q2.Female, Q3.Female, Q4.Female
 The p-value is 2.2e-16 which is less than 0.05, giving significant evidence to reject the null hypothesis meaning of the predictors in the model is significant.
 
 ```{r}
@@ -69,6 +69,7 @@ ggpairs(scatter_data,
         title = "Scatter Plot Matrix of Full Model Variables",
         aes(alpha = 0.6))
 ```
+
 The density plots on the diagonal show that Mean.Hourly.Gap is still right-skewed, reinforcing the need for a log transformation to improve normality. The correlation values confirm multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with correlations reaching 0.881, indicating that some of these predictors may be redundant and could inflate variance in the model. The scatter plots illustrate strong positive linear relationships between the quartile-based female representation variables, further supporting the presence of collinearity. Meanwhile, Report.Year exhibits weak correlations with all variables, implying that it likely does not play a significant role in predicting the gender pay gap.
 
 ```{r}
