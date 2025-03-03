@@ -125,3 +125,6 @@ summary(wls_model)
 ```{r}
 par(mfrow = c(2, 2))
 plot(wls_model) 
+```
+
+The Weighted Least Squares (WLS) regression improved heteroscedasticity, stabilizing residual variance while keeping Q1-Q4 Female percentages statistically significant, confirming their impact on the gender pay gap. However, Report.Year remains insignificant (p = 0.39008), suggesting no significant time trend in the pay gap. Observation 3320 still has high leverage, along with 1893 and 676, indicating strong influence on the model.
