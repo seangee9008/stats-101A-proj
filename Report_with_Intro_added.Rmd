@@ -13,7 +13,7 @@ output:
 
 - **Report.Year**: The specified year in which data was collected  
 - **Mean.Hourly.Gap**: The difference between the mean hourly remuneration of employees of the male gender and that of employees of the female gender expressed as a percentage of the mean hourly remuneration of employees of the male gender  
-- **Median.Hourly.Gap**: The difference between the mean hourly remuneration of employees of the male gender and that of employees of the female gender expressed as a percentage of the mean hourly remuneration of employees of the male gender  
+- **Median.Hourly.Gap**: The difference between the median hourly remuneration of employees of the male gender and that of employees of the female gender expressed as a percentage of the median hourly remuneration of employees of the male gender  
 - **Q1.Female**: The percentage of all female employees who fall within the lower remuneration quartile  
 - **Q2.Female**: The percentage of all female employees who fall within the lower-middle remuneration quartile  
 - **Q3.Female**: The percentage of all female employees who fall within the upper-middle remuneration quartile  
@@ -25,7 +25,7 @@ output:
   
 &nbsp;
 
-  This study reports summary statistics of all utilized variables, scatterplot matrices, diagnostic plots, and density plots. Our data was initially fitted using a generalized full model. However, through a series of descriptive tests, we saw that the relationship between mean pay gap and gender/year lacks heteroscedasticity. To mitigate this issue our team used a weighted least squares (WLS) regression model to preserve constant variance. Effectively, this allowed us to better understand the relationship between pay gaps among different Irish companies while taking into account gender and year. Ultimately, we unveiled that gender was statistically significant to mean pay gaps, whereas year was not. These results provide modern insights into the persistence of gender-based pay disparities across Irish companies.
+  This study reports summary statistics of all utilized variables, scatterplot matrices, diagnostic plots, and density plots. Our data was initially fitted using a generalized full model. However, through a series of descriptive tests, we saw that the relationship between mean pay gap and gender/year lacked heteroscedasticity. To mitigate this issue our team used a weighted least squares (WLS) regression model to preserve constant variance. Effectively, allowing us to better understand the relationship between pay gaps among different Irish companies while taking into account gender and year. Ultimately, we unveiled that gender was statistically significant to mean pay gaps, whereas year was not. These results provide modern insights into the persistence of gender-based pay disparities across Irish companies.
 
 
 ```{r, echo = T, warning=FALSE, message=FALSE}
