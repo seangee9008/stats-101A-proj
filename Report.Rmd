@@ -27,15 +27,25 @@ barplot(report_years, xlab="Year Reported", ylab="Count")
 ```
 
 ## Extract variables
+
+There are many variables that will not contribute to our research question, so we removed them from our exploration and analyses. Our research question is interested in the relationship of gender pay gaps and gender composition in companies, so we excluded company names and types even though they could be affecting pay gaps under other contexts.
+
+We also excluded types of pays, including bonus and BIK (benefit in kind), since we are only interested one response variables and hourly gaps are the most commonly recognized meausre of comparing wage gaps.
+
+Finally, we also excluded percentage of males since it's generally a reciprocal of percentage of females. While the percentages do not correlated with each other 100%, for practicality we are only using percentage of female employees as gender composition of companies.
+
+In the end, we examined report years, hourly pay gaps, and gender composition of each company to see which variables are the most sensible to construct a model from.
+
 ```{r}
 new_table <- data.frame(Report.Year, Mean.Hourly.Gap, Median.Hourly.Gap, Q1.Female, Q2.Female, Q3.Female, Q4.Female, Percentage.Employees.Female)
-
-## Descriptive tables
-st(new_table, digits=4)
-
-cor(new_table)
-pairs(new_table)
 ```
+
+### Summary Table
+```{r}
+st(new_table, digits=6)
+```
+
+From the summary table, we can see that there are companies with very few or even no female employees. Upon further examination, we discovered that some of these companies reported 0 in the pay gaps. Including these companies in our model will make no sense as 0 for these companies does not mean there are no difference in the hourly pay between gender, but rather *since there are no female employees, there doesn't exist a pay gap*. Since these companies will **NOT** contribute in answering our research question, we will remove them from our subsequent model analyses.
 
 ### Distribution of variables
 ```{r}
@@ -45,7 +55,28 @@ for (col in 2:ncol(new_table)){
 }
 ```
 
+All the quantitative variables look approximately normally distributed, with the pay gaps centered around zero and the composition variables centered around 50%.
+
+The rationale of reporting median pay gaps is that it is resistant to the influence of outliers. For example, if a company has a high median pay gap but a low mean, this means that only a few female employees are receiving similar pays as their male counterparts while the rest get paid a lot less. However, judging from the summary table and distribution graphs, the mean and median pay gap of the data set share similar distribution, which shows that both measures capture a similar pay gap situation, so it is pratical to just use one of them. Since we're only interested in one response variable and the mean is a more commonly used measure, we picked mean hourly gap as our response variable for our model.
+
+### Correlation table
+```{r}
+cor(new_table)
+pairs(new_table)
+```
+
+Judging from the correlation table and plot, it seems like the pay gaps (mean and median) are somewhat positively correlated with each other, but they don't seem to correlate with the gender composition.
+
+On the other hand, gender composition variables are positively correlated with each others but not correlated with the pay gap variables.
+
+One thing to note that since the overall Percentage Female Employees are highly correlated with the quartile compositions and that the percentage can be directly calculated by combining the quartiles, we believe that it would be redundant to include the variable in our model, so we dropped it.
+
+### Variable selection
+
+After all the exploration and discussion, we have selected,for our initial model, **Mean Hourly Gap** as our response variable (see reasons above) and **Report Year** (to examine if there is an overall trend in pay gaps over the years) and **Q1 - Q4 Female percentages** as our predictor variables.
+
 ## Results and Interpretation
+
 ```{r}
 full_model <- lm(Mean.Hourly.Gap ~ Report.Year+Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = data)
 summary(full_model)
@@ -81,13 +112,13 @@ The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Femal
 
 # Weighted Least Solutions
 ```{r}
-ols_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = df_cleaned)
+ols_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = data)
 residuals_ols <- abs(resid(ols_model))
 variance_model <- lm(residuals_ols ~ fitted(ols_model))
 weights <- 1 / (fitted(variance_model)^2)
 
 wls_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, 
-                data = df_cleaned, weights = weights)
+                data = data, weights = weights)
 summary(wls_model)
 ```
 
