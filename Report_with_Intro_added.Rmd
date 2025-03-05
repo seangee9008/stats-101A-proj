@@ -135,6 +135,25 @@ vif(full_model)  # If VIF > 5, consider removing redundant variables
 
 The VIF indicate moderate multicollinearity among Q1.Female, Q2.Female, Q3.Female, and Q4.Female, with Q3.Female exceeding the threshold of 5, suggesting that some predictors may be redundant and could inflate standard errors.
 
+```{r}
+#Test to see if we can remove report year
+reduced_model <- lm(Mean.Hourly.Gap ~ Q1.Female+Q2.Female+Q3.Female+Q4.Female, data = data)
+
+anova(reduced_model, full_model)
+```
+
+The partial F-test suggests that we fail to reject the null hypothesis that the beta coefficient associated with Report Year is 0, which means that we can remove the variable.
+
+```{r}
+par(mfrow=c(2, 2))
+avPlot(full_model, variable = "Q1.Female", ask=FALSE)
+avPlot(full_model, variable = "Q2.Female", ask = FALSE)
+avPlot(full_model, variable = "Q3.Female", ask = FALSE)
+avPlot(full_model, variable = "Q4.Female", ask = FALSE)
+```
+
+All gender composition variables seem to contribute somewhat to the model, so we should preserve all four.
+
 # Weighted Least Solutions
 ```{r}
 ols_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = data)
