@@ -154,6 +154,8 @@ avPlot(full_model, variable = "Q4.Female", ask = FALSE)
 
 All gender composition variables seem to contribute somewhat to the model, so we should preserve all four.
 
+TODO: run 1) Exploring all subsets 2) Forward selection and 3) backward selection if needed
+
 # Weighted Least Solutions
 ```{r}
 ols_model <- lm(Mean.Hourly.Gap ~ Q1.Female + Q2.Female + Q3.Female + Q4.Female, data = data)
@@ -172,3 +174,7 @@ plot(wls_model)
 ```
 
 The Weighted Least Squares (WLS) regression improved heteroscedasticity, stabilizing residual variance while keeping Q1-Q4 Female percentages statistically significant, confirming their impact on the gender pay gap. However, Report.Year remains insignificant (p = 0.39008), suggesting no significant time trend in the pay gap. Observation 332 still has high leverage, along with 189 and 676, indicating strong influence on the model.
+
+# Suggestions from Professor
+
+push by adding constant
