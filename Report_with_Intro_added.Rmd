@@ -65,6 +65,7 @@ In the end, we examined report years, hourly pay gaps, and gender composition of
 new_table <- data.frame(Report.Year, Mean.Hourly.Gap, Median.Hourly.Gap, Q1.Female, Q2.Female, Q3.Female, Q4.Female, Percentage.Employees.Female)
 ```
 
+
 ### Summary Table
 ```{r}
 st(new_table, digits=6)
@@ -177,4 +178,4 @@ The Weighted Least Squares (WLS) regression improved heteroscedasticity, stabili
 
 # Suggestions from Professor
 
-push by adding constant
+push by adding constant before box-cox and then apply transformation to the original variabels

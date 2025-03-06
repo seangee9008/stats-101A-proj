@@ -1,0 +1,144 @@
+---
+title: "Revised Report"
+author: "Oscar Su"
+date: "2025-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, echo = T, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(car)
+library(GGally)
+library(MASS)
+library(vtable)
+data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% dplyr::select(-X)
+attach(data)
+```
+# Summary statistics and data exploration
+
+## Distribution of categorical variables
+```{r}
+par(mfrow = c(1, 2))
+company_type <- table(NACE.Letter)
+barplot(company_type, xlab="Company Type by NACE Letters", ylab="Count")
+
+report_years <- table(Report.Year)
+barplot(report_years, xlab="Year Reported", ylab="Count")
+```
+
+## Extract variables
+
+```{r}
+new_table <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`))
+```
+
+
+### Summary Table
+```{r}
+st(new_table, digits=4)
+```
+
+### Distribution of variables
+```{r}
+par(mfrow = c(2,4))
+for (col in 2:ncol(new_table)){
+  hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
+}
+```
+
+
+### Correlation table
+```{r}
+cor(new_table)
+pairs(new_table)
+```
+
+Removing highly correlated variables
+```{r}
+new_table <- new_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
+
+st(new_table, digits = 3)
+```
+
+## Results and Interpretation
+
+```{r}
+full_model <- lm(`Mean.Hourly.Gap` ~ ., data = new_table)
+summary(full_model)
+```
+
+From the full model, we derive the equation:
+(something)
+
+```{r}
+par(mfrow = c(2,2))
+plot(full_model)
+```
+
+The Residuals vs Fitted plot shows the relationship is linear at mean 0. The Q-Q plot shows heavy tailing indicating deviation from normality. There also seems to be non-constant variance shown in the standardized residuals plot which violates the linear model assumption. Residuals vs Leverage doesn't show any outliers or leverage points that need inspection.
+
+### Transformation
+```{r}
+shifted_table <- new_table %>% 
+  mutate(`Mean.Hourly.Gap` = `Mean.Hourly.Gap` + 1 - min(`Mean.Hourly.Gap`)) %>% 
+  mutate(`Mean.Bonus.Gap` = `Mean.Bonus.Gap` + 1 - min(`Mean.Bonus.Gap`)) %>% 
+  mutate(`Median.Bonus.Gap` = `Median.Bonus.Gap` + 1 - min(`Median.Bonus.Gap`)) %>% 
+  mutate(`Mean.Hourly.Gap.Part.Time` = `Mean.Hourly.Gap.Part.Time` + 1 - min(`Mean.Hourly.Gap.Part.Time`)) %>% 
+  mutate(`Mean.Hourly.Gap.Part.Temp` = `Mean.Hourly.Gap.Part.Temp` + 1 - min(`Mean.Hourly.Gap.Part.Temp`)) %>% 
+  mutate(`Percentage.Bonus.Paid.Female` = `Percentage.Bonus.Paid.Female` + 1) %>% 
+  mutate(`Percentage.BIK.Paid.Female` = `Percentage.BIK.Paid.Female` + 1) %>% 
+  mutate(`Percentage.Employees.Female` = `Percentage.Employees.Female` + 1)
+
+attach(shifted_table)
+#method 1
+summary(powerTransform(cbind(Mean.Hourly.Gap, Report.Year,Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Temp, Mean.Hourly.Gap.Part.Time, Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female)~1))
+# Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female
+```
+
+```{r}
+#fit transformed
+attach(new_table)
+tMHG <- `Mean.Hourly.Gap`^0.73
+tRY <- `Report.Year`^3
+tMBG <- `Mean.Bonus.Gap`^0.72
+tMeBG <- `Median.Bonus.Gap`^6.5
+tMHGPTe <- `Mean.Hourly.Gap.Part.Temp`^1.68
+tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2.23
+tPBPF <- `Percentage.Bonus.Paid.Female`^0.3
+tPBIKPF <- `Percentage.BIK.Paid.Female`^0.07
+tPEF <- `Percentage.Employees.Female`^0.87
+tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
+summary(tModel)
+
+par(mfrow=c(2,2))
+plot(tModel)
+```
+Look at correlation
+```{r}
+pairs(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
+```
+```{r}
+# VIF
+vif(tModel)  # If VIF > 5, consider removing redundant variables
+```
+
+# Variable selection
+
+## All subsets
+```{r}
+library(leaps)
+X <- cbind(tRY,tMBG,tMeBG,tMHGPTe,tMHGPTi,tPBPF,tPBIKPF,tPEF)
+
+#b <- regsubsets(as.matrix(X), tMHG) #CAN'T FIT SINCE THERE ARE NaNs
+#summary(b)
+
+##TODO Try variable selection with original (non-transformed) model
+```
+# Suggestions from Professor
+
+push by adding constant before box-cox and then apply transformation to the original variabels
