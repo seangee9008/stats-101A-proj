@@ -138,7 +138,117 @@ X <- cbind(tRY,tMBG,tMeBG,tMHGPTe,tMHGPTi,tPBPF,tPBIKPF,tPEF)
 #summary(b)
 
 ##TODO Try variable selection with original (non-transformed) model
+attach(new_table)
+X <- cbind(Report.Year, Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Time, Mean.Hourly.Gap.Part.Temp, Percentage.BIK.Paid.Female, Percentage.Bonus.Paid.Female, Percentage.Employees.Female)
+b <- regsubsets(as.matrix(X), Mean.Hourly.Gap)
+summary(b)
+
+#per the subset suggestions...
+## p = 1
+om1 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap)
+p <- 1; n <- nrow(new_table)
+
+Rad1 <- summary(om1)$adj.r.squared
+AIC1 <- extractAIC(om1)[2]
+AICc1 <- extractAIC(om1)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC1 <- extractAIC(om1, k=log(n))[2]
+M1 <- c(Rad1, AIC1, AICc1, BIC1)
+
+## p = 2
+om2 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Percentage.Bonus.Paid.Female)
+p <- 2; n <- nrow(new_table)
+
+Rad2 <- summary(om2)$adj.r.squared
+AIC2 <- extractAIC(om2)[2]
+AICc2 <- extractAIC(om2)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC2 <- extractAIC(om2, k=log(n))[2]
+M2 <- c(Rad2, AIC2, AICc2, BIC2)
+
+## p = 3
+om3 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Percentage.Bonus.Paid.Female)
+p <- 3; n <- nrow(new_table)
+
+Rad3 <- summary(om3)$adj.r.squared
+AIC3 <- extractAIC(om3)[2]
+AICc3 <- extractAIC(om3)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC3 <- extractAIC(om3, k=log(n))[2]
+M3 <- c(Rad3, AIC3, AICc3, BIC3)
+
+## p = 4
+om4 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Percentage.Bonus.Paid.Female+Percentage.Employees.Female)
+p <- 4; n <- nrow(new_table)
+
+Rad4 <- summary(om4)$adj.r.squared
+AIC4 <- extractAIC(om4)[2]
+AICc4 <- extractAIC(om4)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC4 <- extractAIC(om4, k=log(n))[2]
+M4 <- c(Rad4, AIC4, AICc4, BIC4)
+
+## p = 5
+om5 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.Bonus.Paid.Female+Percentage.Employees.Female)
+p <- 5; n <- nrow(new_table)
+
+Rad5 <- summary(om5)$adj.r.squared
+AIC5 <- extractAIC(om5)[2]
+AICc5 <- extractAIC(om5)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC5 <- extractAIC(om5, k=log(n))[2]
+M5 <- c(Rad5, AIC5, AICc5, BIC5)
+
+## p = 6
+om6 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female)
+p <- 6; n <- nrow(new_table)
+
+Rad6 <- summary(om6)$adj.r.squared
+AIC6 <- extractAIC(om6)[2]
+AICc6 <- extractAIC(om6)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC6 <- extractAIC(om6, k=log(n))[2]
+M6 <- c(Rad6, AIC6, AICc6, BIC6)
+
+## p = 7
+om7 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female)
+p <- 7; n <- nrow(new_table)
+
+Rad7 <- summary(om7)$adj.r.squared
+AIC7 <- extractAIC(om7)[2]
+AICc7 <- extractAIC(om7)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC7 <- extractAIC(om7, k=log(n))[2]
+M7 <- c(Rad7, AIC7, AICc7, BIC7)
+
+## p = 8
+om8 <- lm(Mean.Hourly.Gap ~ Report.Year+ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female)
+p <- 8; n <- nrow(new_table)
+
+Rad8 <- summary(om8)$adj.r.squared
+AIC8 <- extractAIC(om8)[2]
+AICc8 <- extractAIC(om8)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC8 <- extractAIC(om8, k=log(n))[2]
+M8 <- c(Rad8, AIC8, AICc8, BIC8)
+
+compare_table <- data.frame(rbind(M1, M2, M3, M4, M5, M6, M7, M8))
+names(compare_table) <- c("Rad", "AIC", "AICc", "BIC")
+compare_table
+
+which(compare_table$Rad == max(compare_table$Rad))
+which(compare_table$AIC == min(compare_table$AIC))
+which(compare_table$AICc == min(compare_table$AICc))
+which(compare_table$BIC == min(compare_table$BIC))
+
+summary(om8)
 ```
+
+Full subset exploration suggests the full model
+
+## Backward selection
+```{r}
+backwardAIC <- step(full_model, direction = "backward", data = new_table)
+```
+
+## Forward selection
+```{r}
+mint <- lm(Mean.Hourly.Gap~1,data=new_table)
+forwardAIC <- step(mint, scope=list(lower = ~1, upper=~Report.Year+ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female), direction="forward", data=new_table)
+```
+
 # Suggestions from Professor
 
 push by adding constant before box-cox and then apply transformation to the original variabels
