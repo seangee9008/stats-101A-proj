@@ -30,9 +30,14 @@ barplot(company_type, xlab="Company Type by NACE Letters", ylab="Count")
 report_years <- table(Report.Year)
 barplot(report_years, xlab="Year Reported", ylab="Count")
 
-#Two groups
+#Two groups 
 ## Companies that have NACE letter F, K, or M
+group_1 <- data %>% filter(NACE.Letter %in% c('F', 'K', 'M'))
 ## Companies not in these letters
+group_2 <- data %>% filter(!(NACE.Letter %in% c('F', 'K', 'M')))
+
+# I created two distinct groups using the pipe operator and in function! lmk if you guys want me to make any changes
+# - Shelby
 ```
 
 ## Extract variables
