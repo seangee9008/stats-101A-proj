@@ -29,6 +29,10 @@ barplot(company_type, xlab="Company Type by NACE Letters", ylab="Count")
 
 report_years <- table(Report.Year)
 barplot(report_years, xlab="Year Reported", ylab="Count")
+
+#Two groups
+## Companies that have NACE letter F, K, or M
+## Companies not in these letters
 ```
 
 ## Extract variables
