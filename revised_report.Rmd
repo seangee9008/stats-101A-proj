@@ -30,6 +30,12 @@ barplot(company_type, xlab="Company Type by NACE Letters", ylab="Count")
 report_years <- table(Report.Year)
 barplot(report_years, xlab="Year Reported", ylab="Count")
 
+# create an added variable group
+data$group <- ifelse(data$NACE.Letter %in% c('F', 'K', 'M'), 1, 0)
+head(data)
+#group 1 is denoted by 1
+#group 2 is denoted by 0
+
 #Two groups 
 ## Companies that have NACE letter F, K, or M
 group_1 <- data %>% filter(NACE.Letter %in% c('F', 'K', 'M'))
@@ -66,6 +72,18 @@ par(mfrow = c(2,4))
 for (col in 2:ncol(new_table)){
   hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
 }
+
+#group 1
+par(mfrow = c(2,4))
+for (col in 2:ncol(group_1_table)){
+  hist(group_1_table[, col], main=colnames(group_1_table)[col], xlab=colnames(group_1_table)[col])
+}
+
+#group 2
+par(mfrow = c(2,4))
+for (col in 2:ncol(group_2_table)){
+  hist(group_2_table[, col], main=colnames(group_2_table)[col], xlab=colnames(group_2_table)[col])
+}
 ```
 
 
@@ -73,6 +91,14 @@ for (col in 2:ncol(new_table)){
 ```{r}
 cor(new_table)
 pairs(new_table)
+
+#group 1
+cor(group_1_table)
+pairs(group_1_table)
+
+#group 2
+cor(group_2_table)
+pairs(group_2_table)
 ```
 
 Removing highly correlated variables
@@ -87,6 +113,19 @@ st(new_table, digits = 3)
 ```{r}
 full_model <- lm(`Mean.Hourly.Gap` ~ ., data = new_table)
 summary(full_model)
+
+#maybe we could use binomial logisitic regression to interpret whether or
+# not there is a sig diff between groups 1 and 2
+# Fit logistic regression model: log-odds of being in group_1 as a function of pay
+logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
+logit_model_all <- glm(group ~ ., data = data, family = binomial)
+
+
+summary(logit_model)
+summary(logit_model_all)
+
+# not sure if this is a viable solution
+
 ```
 
 From the full model, we derive the equation:
