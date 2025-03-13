@@ -44,12 +44,20 @@ group_2 <- data %>% filter(!(NACE.Letter %in% c('F', 'K', 'M')))
 
 ```{r}
 new_table <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`))
+
+group_1_table <- group_1 %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`)) 
+
+group_2_table <- group_2 %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`))
 ```
 
 
 ### Summary Table
 ```{r}
 st(new_table, digits=4)
+
+st(group_1_table, digits =4,title = "Group 1 Summary Statistics")
+
+st(group_2_table, digits =4,title = "Group 2 Summary Statistics")
 ```
 
 ### Distribution of variables
