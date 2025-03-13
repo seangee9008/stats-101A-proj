@@ -116,8 +116,10 @@ summary(full_model)
 
 #maybe we could use binomial logisitic regression to interpret whether or
 # not there is a sig diff between groups 1 and 2
-# Fit logistic regression model: log-odds of being in group_1 as a function of pay
+# binomial log reg  
+# group vs. mean hour gap
 logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
+#group vs. all other variables
 logit_model_all <- glm(group ~ ., data = data, family = binomial)
 
 
