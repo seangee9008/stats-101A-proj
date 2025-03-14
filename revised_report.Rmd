@@ -106,6 +106,15 @@ Removing highly correlated variables
 new_table <- new_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
 
 st(new_table, digits = 3)
+
+#option 2 simple linear regression as opposed to bin log reg
+group_1_table <- group_1_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
+
+st(group_1_table, digits = 3)
+
+group_2_table <- group_2_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
+
+st(group_2_table, digits = 3)
 ```
 
 ## Results and Interpretation
@@ -127,6 +136,14 @@ summary(logit_model)
 summary(logit_model_all)
 
 # not sure if this is a viable solution
+
+
+#option 2 simple linear regression as opposed to bin log reg
+group_1_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_1_table)
+summary(group_1_full_model)
+
+group_2_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_2_table)
+summary(group_2_full_model)
 
 ```
 
