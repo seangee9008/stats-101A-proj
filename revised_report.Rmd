@@ -127,23 +127,23 @@ summary(full_model)
 # not there is a sig diff between groups 1 and 2
 # binomial log reg  
 # group vs. mean hour gap
-logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
+#logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
 #group vs. all other variables
-logit_model_all <- glm(group ~ ., data = data, family = binomial)
+#logit_model_all <- glm(group ~ ., data = data, family = binomial)
 
 
-summary(logit_model)
-summary(logit_model_all)
+#summary(logit_model)
+#summary(logit_model_all)
 
 # not sure if this is a viable solution
 
 
 #option 2 simple linear regression as opposed to bin log reg
-group_1_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_1_table)
-summary(group_1_full_model)
+#group_1_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_1_table)
+#summary(group_1_full_model)
 
-group_2_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_2_table)
-summary(group_2_full_model)
+#group_2_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_2_table)
+#summary(group_2_full_model)
 
 ```
 
@@ -153,11 +153,13 @@ From the full model, we derive the equation:
 ```{r}
 par(mfrow = c(2,2))
 plot(full_model)
+browser()
 ```
 
 The Residuals vs Fitted plot shows the relationship is linear at mean 0. The Q-Q plot shows heavy tailing indicating deviation from normality. There also seems to be non-constant variance shown in the standardized residuals plot which violates the linear model assumption. Residuals vs Leverage doesn't show any outliers or leverage points that need inspection.
 
 ```{r bi}
+
 g_diff <- logit_model_all$null.deviance - logit_model_all$deviance
 g_diff
 
