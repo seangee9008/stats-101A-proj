@@ -115,6 +115,13 @@ st(group_1_table, digits = 3)
 group_2_table <- group_2_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
 
 st(group_2_table, digits = 3)
+
+
+binom  <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, 
+                                    `NACE.Division`, `Q1.Female`, `Q2.Female`, 
+                                    `Q3.Female`, `Q4.Female`, `Q1.Men`, 
+                                    `Q2.Male`, `Q3.Male`, `Q4.Male`))
+#i think this should make stuff run faster!
 ```
 
 ## Results and Interpretation
@@ -132,7 +139,9 @@ plot(full_model)
 # group vs. mean hour gap
 #logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
 #group vs. all other variables
-#logit_model_all <- glm(group ~ ., data = data, family = binomial)
+#logit_model_all <- glm(group ~ ., data = binom, family = binomial)
+
+#using binom table to speed things up ^ for logit_model_all 
 
 
 #summary(logit_model)
