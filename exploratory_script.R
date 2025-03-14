@@ -5,7 +5,7 @@ library(MASS)
 library(vtable)
 data <- read.csv("cleaned_dataset.csv", header=TRUE) %>% dplyr::select(-X)
 attach(data)
-```
+
 # Summary statistics and data exploration
 
 ## Distribution of categorical variables

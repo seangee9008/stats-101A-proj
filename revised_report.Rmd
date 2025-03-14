@@ -123,6 +123,9 @@ st(group_2_table, digits = 3)
 full_model <- lm(`Mean.Hourly.Gap` ~ ., data = new_table)
 summary(full_model)
 
+par(mfrow = c(2,2))
+plot(full_model)
+
 #maybe we could use binomial logisitic regression to interpret whether or
 # not there is a sig diff between groups 1 and 2
 # binomial log reg  
@@ -147,23 +150,14 @@ summary(full_model)
 
 ```
 
-From the full model, we derive the equation:
-(something)
-
-```{r}
-par(mfrow = c(2,2))
-plot(full_model)
-browser()
-```
-
 The Residuals vs Fitted plot shows the relationship is linear at mean 0. The Q-Q plot shows heavy tailing indicating deviation from normality. There also seems to be non-constant variance shown in the standardized residuals plot which violates the linear model assumption. Residuals vs Leverage doesn't show any outliers or leverage points that need inspection.
 
 ```{r bi}
 
-g_diff <- logit_model_all$null.deviance - logit_model_all$deviance
-g_diff
+#g_diff <- logit_model_all$null.deviance - logit_model_all$deviance
+#g_diff
 
-pchisq(g_diff,806,lower.tail=FALSE)
+#pchisq(g_diff,806,lower.tail=FALSE)
 
 ```
 Since our p-value 9.684606e-50 is smaller than 0.05, the predictors in the model,
@@ -199,6 +193,11 @@ tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2.23
 tPBPF <- `Percentage.Bonus.Paid.Female`^0.3
 tPBIKPF <- `Percentage.BIK.Paid.Female`^0.07
 tPEF <- `Percentage.Employees.Female`^0.87
+
+#NaN produced
+tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF))
+st(tTable)
+
 tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
 summary(tModel)
 
