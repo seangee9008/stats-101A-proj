@@ -165,17 +165,20 @@ summary(powerTransform(cbind(Mean.Hourly.Gap, Report.Year,Mean.Bonus.Gap, Median
 ```{r}
 #transform original variables
 attach(new_table)
-tMHG <- `Mean.Hourly.Gap`^0.73
-tRY <- `Report.Year`^3
-tMBG <- `Mean.Bonus.Gap`^0.72
-tMeBG <- `Median.Bonus.Gap`^6.5
-tMHGPTe <- `Mean.Hourly.Gap.Part.Temp`^1.68
-tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2.23
-tPBPF <- `Percentage.Bonus.Paid.Female`^0.3
-tPBIKPF <- `Percentage.BIK.Paid.Female`^0.07
-tPEF <- `Percentage.Employees.Female`^0.87
-tGroup <- group^-2.35
+tMHG <- Mean.Hourly.Gap^1
+tRY <- Report.Year^3
+tMBG <- Mean.Bonus.Gap^1
+tMeBG <- Median.Bonus.Gap^7
+tMHGPTe <- `Mean.Hourly.Gap.Part.Temp`^2
+tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2
+tPBPF <- log(`Percentage.Bonus.Paid.Female`+0.00001)
+tPBIKPF <- log(`Percentage.BIK.Paid.Female`+0.00001)
+tPEF <- `Percentage.Employees.Female`
+tGroup <- group
 
+data.frame(cbind(tMHGPTi, Mean.Hourly.Gap.Part.Time))
+data.frame(cbind(tMHG, Mean.Hourly.Gap))
+print(tMHGPTi)
 #NaN produced
 tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF, tGroup))
 st(tTable)
