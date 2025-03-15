@@ -31,16 +31,17 @@ report_years <- table(Report.Year)
 barplot(report_years, xlab="Year Reported", ylab="Count")
 
 # create an added variable group
-data$group <- ifelse(data$NACE.Letter %in% c('F', 'K', 'M'), 1, 0)
+highlighted_industry <- c('K', 'L', 'M', 'N', "G", "J")
+data$group <- ifelse(data$NACE.Letter %in% highlighted_industry, 1, 0)
 head(data)
 #group 1 is denoted by 1
 #group 2 is denoted by 0
 
 #Two groups 
 ## Companies that have NACE letter F, K, or M
-group_1 <- data %>% filter(NACE.Letter %in% c('F', 'K', 'M'))
+group_1 <- data %>% filter(NACE.Letter %in% highlighted_industry)
 ## Companies not in these letters
-group_2 <- data %>% filter(!(NACE.Letter %in% c('F', 'K', 'M')))
+group_2 <- data %>% filter(!(NACE.Letter %in% highlighted_industry))
 
 # I created two distinct groups using the pipe operator and in function! lmk if you guys want me to make any changes
 # - Shelby
@@ -68,19 +69,19 @@ st(group_2_table, digits =4,title = "Group 2 Summary Statistics")
 
 ### Distribution of variables
 ```{r}
-par(mfrow = c(2,4))
+par(mfrow = c(2,4), ask=FALSE)
 for (col in 2:ncol(new_table)){
   hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
 }
 
 #group 1
-par(mfrow = c(2,4))
+par(mfrow = c(2,4), ask=FALSE)
 for (col in 2:ncol(group_1_table)){
   hist(group_1_table[, col], main=colnames(group_1_table)[col], xlab=colnames(group_1_table)[col])
 }
 
 #group 2
-par(mfrow = c(2,4))
+par(mfrow = c(2,4), ask=FALSE)
 for (col in 2:ncol(group_2_table)){
   hist(group_2_table[, col], main=colnames(group_2_table)[col], xlab=colnames(group_2_table)[col])
 }
@@ -133,23 +134,6 @@ summary(full_model)
 par(mfrow = c(2,2))
 plot(full_model)
 
-#maybe we could use binomial logisitic regression to interpret whether or
-# not there is a sig diff between groups 1 and 2
-# binomial log reg  
-# group vs. mean hour gap
-#logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
-#group vs. all other variables
-#logit_model_all <- glm(group ~ ., data = binom, family = binomial)
-
-#using binom table to speed things up ^ for logit_model_all 
-
-
-#summary(logit_model)
-#summary(logit_model_all)
-
-# not sure if this is a viable solution
-
-
 #option 2 simple linear regression as opposed to bin log reg
 #group_1_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_1_table)
 #summary(group_1_full_model)
@@ -158,19 +142,6 @@ plot(full_model)
 #summary(group_2_full_model)
 
 ```
-
-The Residuals vs Fitted plot shows the relationship is linear at mean 0. The Q-Q plot shows heavy tailing indicating deviation from normality. There also seems to be non-constant variance shown in the standardized residuals plot which violates the linear model assumption. Residuals vs Leverage doesn't show any outliers or leverage points that need inspection.
-
-```{r bi}
-
-#g_diff <- logit_model_all$null.deviance - logit_model_all$deviance
-#g_diff
-
-#pchisq(g_diff,806,lower.tail=FALSE)
-
-```
-Since our p-value 9.684606e-50 is smaller than 0.05, the predictors in the model,
-significantly improve model fit.
 
 ### Transformation
 ```{r}
@@ -182,16 +153,17 @@ shifted_table <- new_table %>%
   mutate(`Mean.Hourly.Gap.Part.Temp` = `Mean.Hourly.Gap.Part.Temp` + 1 - min(`Mean.Hourly.Gap.Part.Temp`)) %>% 
   mutate(`Percentage.Bonus.Paid.Female` = `Percentage.Bonus.Paid.Female` + 1) %>% 
   mutate(`Percentage.BIK.Paid.Female` = `Percentage.BIK.Paid.Female` + 1) %>% 
-  mutate(`Percentage.Employees.Female` = `Percentage.Employees.Female` + 1)
+  mutate(`Percentage.Employees.Female` = `Percentage.Employees.Female` + 1) %>% 
+  mutate(group = group + 1)
 
 attach(shifted_table)
 #method 1
-summary(powerTransform(cbind(Mean.Hourly.Gap, Report.Year,Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Temp, Mean.Hourly.Gap.Part.Time, Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female)~1))
+summary(powerTransform(cbind(Mean.Hourly.Gap, Report.Year,Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Temp, Mean.Hourly.Gap.Part.Time, Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female, group)~1))
 # Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female
 ```
 
 ```{r}
-#fit transformed
+#transform original variables
 attach(new_table)
 tMHG <- `Mean.Hourly.Gap`^0.73
 tRY <- `Report.Year`^3
@@ -202,9 +174,10 @@ tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2.23
 tPBPF <- `Percentage.Bonus.Paid.Female`^0.3
 tPBIKPF <- `Percentage.BIK.Paid.Female`^0.07
 tPEF <- `Percentage.Employees.Female`^0.87
+tGroup <- group^-2.35
 
 #NaN produced
-tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF))
+tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF, tGroup))
 st(tTable)
 
 tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
@@ -213,6 +186,32 @@ summary(tModel)
 par(mfrow=c(2,2))
 plot(tModel)
 ```
+
+```{r}
+#transform shifted variables
+attach(shifted_table)
+tMHG <- `Mean.Hourly.Gap`^0.73
+tRY <- `Report.Year`^3
+tMBG <- `Mean.Bonus.Gap`^0.72
+tMeBG <- `Median.Bonus.Gap`^6.5
+tMHGPTe <- `Mean.Hourly.Gap.Part.Temp`^1.68
+tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2.23
+tPBPF <- `Percentage.Bonus.Paid.Female`^0.3
+tPBIKPF <- `Percentage.BIK.Paid.Female`^0.07
+tPEF <- `Percentage.Employees.Female`^0.87
+tGroup <- group^-2.35
+
+#NaN produced
+tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF, tGroup))
+st(tTable)
+
+tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF+tGroup)
+summary(tModel)
+
+par(mfrow=c(2,2))
+plot(tModel)
+```
+
 Look at correlation
 ```{r}
 pairs(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
@@ -227,15 +226,20 @@ vif(tModel)  # If VIF > 5, consider removing redundant variables
 ## All subsets
 ```{r}
 library(leaps)
-X <- cbind(tRY,tMBG,tMeBG,tMHGPTe,tMHGPTi,tPBPF,tPBIKPF,tPEF)
+X <- cbind(tRY,tMBG,tMeBG,tMHGPTe,tMHGPTi,tPBPF,tPBIKPF,tPEF, tGroup)
 
-#b <- regsubsets(as.matrix(X), tMHG) #CAN'T FIT SINCE THERE ARE NaNs
-#summary(b)
+b <- regsubsets(as.matrix(X), tMHG) #CAN'T FIT SINCE THERE ARE NaNs
+summary(b)
+
+step(tModel, direction = "backward", data = shifted_table)
+```
+
+```{r}
 
 ##TODO Try variable selection with original (non-transformed) model
 attach(new_table)
-X <- cbind(Report.Year, Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Time, Mean.Hourly.Gap.Part.Temp, Percentage.BIK.Paid.Female, Percentage.Bonus.Paid.Female, Percentage.Employees.Female)
-b <- regsubsets(as.matrix(X), Mean.Hourly.Gap)
+X <- cbind(Report.Year, Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Time, Mean.Hourly.Gap.Part.Temp, Percentage.BIK.Paid.Female, Percentage.Bonus.Paid.Female, Percentage.Employees.Female, group)
+b <- regsubsets(as.matrix(X), Mean.Hourly.Gap, nvmax = 9)
 summary(b)
 
 #per the subset suggestions...
@@ -310,7 +314,7 @@ BIC7 <- extractAIC(om7, k=log(n))[2]
 M7 <- c(Rad7, AIC7, AICc7, BIC7)
 
 ## p = 8
-om8 <- lm(Mean.Hourly.Gap ~ Report.Year+ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female)
+om8 <- lm(Mean.Hourly.Gap ~ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female+group)
 p <- 8; n <- nrow(new_table)
 
 Rad8 <- summary(om8)$adj.r.squared
@@ -319,7 +323,16 @@ AICc8 <- extractAIC(om8)[2] + 2*(p+2)*(p+3)/(n-p-1)
 BIC8 <- extractAIC(om8, k=log(n))[2]
 M8 <- c(Rad8, AIC8, AICc8, BIC8)
 
-compare_table <- data.frame(rbind(M1, M2, M3, M4, M5, M6, M7, M8))
+om9 <- lm(Mean.Hourly.Gap ~ Report.Year + Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female+group)
+p <- 9; n <- nrow(new_table)
+
+Rad9 <- summary(om9)$adj.r.squared
+AIC9 <- extractAIC(om9)[2]
+AICc9 <- extractAIC(om9)[2] + 2*(p+2)*(p+3)/(n-p-1)
+BIC9 <- extractAIC(om9, k=log(n))[2]
+M9 <- c(Rad9, AIC9, AICc9, BIC9)
+
+compare_table <- data.frame(rbind(M1, M2, M3, M4, M5, M6, M7, M8, M9))
 names(compare_table) <- c("Rad", "AIC", "AICc", "BIC")
 compare_table
 
@@ -328,10 +341,10 @@ which(compare_table$AIC == min(compare_table$AIC))
 which(compare_table$AICc == min(compare_table$AICc))
 which(compare_table$BIC == min(compare_table$BIC))
 
-summary(om8)
+summary(om9)
 ```
 
-Full subset exploration suggests the full model
+Full subset exploration suggests the model with 9 predictors (full model)
 
 ## Backward selection
 ```{r}
@@ -341,9 +354,27 @@ backwardAIC <- step(full_model, direction = "backward", data = new_table)
 ## Forward selection
 ```{r}
 mint <- lm(Mean.Hourly.Gap~1,data=new_table)
-forwardAIC <- step(mint, scope=list(lower = ~1, upper=~Report.Year+ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female), direction="forward", data=new_table)
+forwardAIC <- step(mint, scope=list(lower = ~1, upper=~Report.Year+ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female+group), direction="forward", data=new_table)
 ```
 
-# Suggestions from Professor
+## Binomial Logistical Regression
+```{r}
+#maybe we could use binomial logisitic regression to interpret whether or
+# not there is a sig diff between groups 1 and 2
+# binomial log reg  
+# group vs. mean hour gap
+#logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
+#group vs. all other variables
+logit_model_all <- glm(group ~ ., data = new_table, family = binomial)
 
-push by adding constant before box-cox and then apply transformation to the original variabels
+#using binom table to speed things up ^ for logit_model_all 
+
+
+#summary(logit_model)
+summary(logit_model_all)
+g_diff <- logit_model_all$null.deviance - logit_model_all$deviance
+g_diff
+
+pchisq(g_diff,logit_model_all$df.null-logit_model_all$df.residual,lower.tail=FALSE)
+# not sure if this is a viable solution
+```
