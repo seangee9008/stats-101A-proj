@@ -51,55 +51,17 @@ group_2 <- data %>% filter(!(NACE.Letter %in% highlighted_industry))
 
 ```{r}
 new_table <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`))
-
-group_1_table <- group_1 %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`)) 
-
-group_2_table <- group_2 %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`))
 ```
 
 
-### Summary Table
 ```{r}
 st(new_table, digits=4)
-
-st(group_1_table, digits =4,title = "Group 1 Summary Statistics")
-
-st(group_2_table, digits =4,title = "Group 2 Summary Statistics")
 ```
 
-### Distribution of variables
-```{r}
-par(mfrow = c(2,4), ask=FALSE)
-for (col in 2:ncol(new_table)){
-  hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
-}
-
-#group 1
-par(mfrow = c(2,4), ask=FALSE)
-for (col in 2:ncol(group_1_table)){
-  hist(group_1_table[, col], main=colnames(group_1_table)[col], xlab=colnames(group_1_table)[col])
-}
-
-#group 2
-par(mfrow = c(2,4), ask=FALSE)
-for (col in 2:ncol(group_2_table)){
-  hist(group_2_table[, col], main=colnames(group_2_table)[col], xlab=colnames(group_2_table)[col])
-}
-```
-
-
-### Correlation table
+## Correlation table
 ```{r}
 cor(new_table)
 pairs(new_table)
-
-#group 1
-cor(group_1_table)
-pairs(group_1_table)
-
-#group 2
-cor(group_2_table)
-pairs(group_2_table)
 ```
 
 Removing highly correlated variables
@@ -107,22 +69,22 @@ Removing highly correlated variables
 new_table <- new_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
 
 st(new_table, digits = 3)
+```
 
-#option 2 simple linear regression as opposed to bin log reg
-group_1_table <- group_1_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
-
-st(group_1_table, digits = 3)
-
-group_2_table <- group_2_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.Gap.Part.Time`, `Median.Hourly.Gap.Part.Temp`, `Percentage.Bonus.Paid.Male`, `Percentage.BIK.Paid.Male`, `Percentage.Employees.Male`))
-
-st(group_2_table, digits = 3)
-
-
+```{r}
 binom  <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, 
                                     `NACE.Division`, `Q1.Female`, `Q2.Female`, 
                                     `Q3.Female`, `Q4.Female`, `Q1.Men`, 
                                     `Q2.Male`, `Q3.Male`, `Q4.Male`))
 #i think this should make stuff run faster!
+```
+
+## Distribution of variables
+```{r}
+par(mfrow = c(3,3), ask=FALSE)
+for (col in 2:ncol(new_table)){
+  hist(new_table[, col], main=colnames(new_table)[col], xlab=colnames(new_table)[col])
+}
 ```
 
 ## Results and Interpretation
