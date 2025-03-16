@@ -138,14 +138,11 @@ tPBIKPF <- log(`Percentage.BIK.Paid.Female`+0.00001)
 tPEF <- `Percentage.Employees.Female`
 tGroup <- group
 
-data.frame(cbind(tMHGPTi, Mean.Hourly.Gap.Part.Time))
-data.frame(cbind(tMHG, Mean.Hourly.Gap))
-print(tMHGPTi)
 #NaN produced
 tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF, tGroup))
 st(tTable)
 
-tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
+tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF+group)
 summary(tModel)
 
 par(mfrow=c(2,2))
@@ -186,22 +183,12 @@ pairs(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF)
 vif(tModel)  # If VIF > 5, consider removing redundant variables
 ```
 
-# Variable selection
+# Variable selection with original model
 
 ## All subsets
 ```{r}
 library(leaps)
-X <- cbind(tRY,tMBG,tMeBG,tMHGPTe,tMHGPTi,tPBPF,tPBIKPF,tPEF, tGroup)
 
-b <- regsubsets(as.matrix(X), tMHG) #CAN'T FIT SINCE THERE ARE NaNs
-summary(b)
-
-step(tModel, direction = "backward", data = shifted_table)
-```
-
-```{r}
-
-##TODO Try variable selection with original (non-transformed) model
 attach(new_table)
 X <- cbind(Report.Year, Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Time, Mean.Hourly.Gap.Part.Temp, Percentage.BIK.Paid.Female, Percentage.Bonus.Paid.Female, Percentage.Employees.Female, group)
 b <- regsubsets(as.matrix(X), Mean.Hourly.Gap, nvmax = 9)
@@ -320,6 +307,10 @@ backwardAIC <- step(full_model, direction = "backward", data = new_table)
 ```{r}
 mint <- lm(Mean.Hourly.Gap~1,data=new_table)
 forwardAIC <- step(mint, scope=list(lower = ~1, upper=~Report.Year+ Mean.Bonus.Gap+Median.Bonus.Gap+Mean.Hourly.Gap.Part.Time+Mean.Hourly.Gap.Part.Temp+Percentage.BIK.Paid.Female+Percentage.Bonus.Paid.Female+Percentage.Employees.Female+group), direction="forward", data=new_table)
+```
+
+```{r}
+vif(full_model)
 ```
 
 ## Binomial Logistical Regression
