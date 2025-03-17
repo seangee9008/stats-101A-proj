@@ -36,15 +36,6 @@ data$group <- ifelse(data$NACE.Letter %in% highlighted_industry, 1, 0)
 head(data)
 #group 1 is denoted by 1
 #group 2 is denoted by 0
-
-#Two groups 
-## Companies that have NACE letter F, K, or M
-group_1 <- data %>% filter(NACE.Letter %in% highlighted_industry)
-## Companies not in these letters
-group_2 <- data %>% filter(!(NACE.Letter %in% highlighted_industry))
-
-# I created two distinct groups using the pipe operator and in function! lmk if you guys want me to make any changes
-# - Shelby
 ```
 
 ## Extract variables
@@ -71,14 +62,6 @@ new_table <- new_table %>% dplyr::select(-c(`Median.Hourly.Gap`, `Median.Hourly.
 st(new_table, digits = 3)
 ```
 
-```{r}
-binom  <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, 
-                                    `NACE.Division`, `Q1.Female`, `Q2.Female`, 
-                                    `Q3.Female`, `Q4.Female`, `Q1.Men`, 
-                                    `Q2.Male`, `Q3.Male`, `Q4.Male`))
-#i think this should make stuff run faster!
-```
-
 ## Distribution of variables
 ```{r}
 par(mfrow = c(3,3), ask=FALSE)
@@ -95,14 +78,6 @@ summary(full_model)
 
 par(mfrow = c(2,2))
 plot(full_model)
-
-#option 2 simple linear regression as opposed to bin log reg
-#group_1_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_1_table)
-#summary(group_1_full_model)
-
-#group_2_full_model <- lm(`Mean.Hourly.Gap` ~ ., data = group_2_table)
-#summary(group_2_full_model)
-
 ```
 
 ### Transformation
@@ -121,7 +96,6 @@ shifted_table <- new_table %>%
 attach(shifted_table)
 #method 1
 summary(powerTransform(cbind(Mean.Hourly.Gap, Report.Year,Mean.Bonus.Gap, Median.Bonus.Gap, Mean.Hourly.Gap.Part.Temp, Mean.Hourly.Gap.Part.Time, Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female, group)~1))
-# Percentage.Bonus.Paid.Female, Percentage.BIK.Paid.Female,Percentage.Employees.Female
 ```
 
 ```{r}
@@ -138,36 +112,10 @@ tPBIKPF <- log(`Percentage.BIK.Paid.Female`+0.00001)
 tPEF <- `Percentage.Employees.Female`
 tGroup <- group
 
-#NaN produced
 tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF, tGroup))
 st(tTable)
 
 tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF+group)
-summary(tModel)
-
-par(mfrow=c(2,2))
-plot(tModel)
-```
-
-```{r}
-#transform shifted variables
-attach(shifted_table)
-tMHG <- `Mean.Hourly.Gap`^0.73
-tRY <- `Report.Year`^3
-tMBG <- `Mean.Bonus.Gap`^0.72
-tMeBG <- `Median.Bonus.Gap`^6.5
-tMHGPTe <- `Mean.Hourly.Gap.Part.Temp`^1.68
-tMHGPTi <- `Mean.Hourly.Gap.Part.Time`^2.23
-tPBPF <- `Percentage.Bonus.Paid.Female`^0.3
-tPBIKPF <- `Percentage.BIK.Paid.Female`^0.07
-tPEF <- `Percentage.Employees.Female`^0.87
-tGroup <- group^-2.35
-
-#NaN produced
-tTable <- data.frame(cbind(tMHG, tRY, tMBG, tMeBG, tMHGPTe, tMHGPTi, tPBPF, tPBIKPF, tPEF, tGroup))
-st(tTable)
-
-tModel <- lm(tMHG ~ tRY + tMBG + tMeBG + tMHGPTe + tMHGPTi+tPBPF+tPBIKPF+tPEF+tGroup)
 summary(tModel)
 
 par(mfrow=c(2,2))
@@ -315,11 +263,8 @@ vif(full_model)
 
 ## Binomial Logistical Regression
 ```{r}
-#maybe we could use binomial logisitic regression to interpret whether or
-# not there is a sig diff between groups 1 and 2
-# binomial log reg  
-# group vs. mean hour gap
-#logit_model <- glm(group ~ `Mean.Hourly.Gap`, data = data, family = binomial)
+#Exploratory binomial logicial regression model (not included in the report)
+binom  <- data %>% dplyr::select(-c(`Company.Name`, `NACE.Section`, `NACE.Letter`, `NACE.Division`, `Q1.Female`, `Q2.Female`, `Q3.Female`, `Q4.Female`, `Q1.Men`, `Q2.Male`, `Q3.Male`, `Q4.Male`))
 #group vs. all other variables
 logit_model_all <- glm(group ~ ., data = new_table, family = binomial)
 
